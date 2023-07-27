@@ -165,6 +165,7 @@ extension MainController: UITableViewDataSource, UITableViewDelegate{
             celda.btnDelete.tag = indexPath.row
             celda.btnUpdate.tag = indexPath.row
             celda.btnUpdate.addTarget(self, action: #selector(updatePais), for: .touchUpInside)
+            celda.btnDelete.addTarget(self, action: #selector(deletePais), for: .touchUpInside)
         }
         
         return celda
@@ -172,7 +173,12 @@ extension MainController: UITableViewDataSource, UITableViewDelegate{
     
     @objc
     func updatePais(_ sender: UIButton) {
-        
+        print("Actualizar pais")
+    }
+    
+    @objc
+    func deletePais(_ sender: UIButton) {
+        print("Eliminar pais")
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
