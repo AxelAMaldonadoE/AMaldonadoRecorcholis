@@ -1,0 +1,6 @@
+framework module Pods_AMaldonadoRecorcholis {
+  umbrella header "Pods-AMaldonadoRecorcholis-umbrella.h"
+
+  export *
+  module * { export * }
+}
