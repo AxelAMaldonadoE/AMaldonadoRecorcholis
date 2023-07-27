@@ -16,6 +16,7 @@ class MainController: UIViewController {
     // MARK: Variables
     var paises: [Pais] = []
     var idPais: Int? = nil
+    var pais: Pais? = nil
     var searchRoot: RootSearch? = nil
 
     override func viewDidLoad() {
@@ -82,7 +83,7 @@ extension MainController: UITableViewDataSource, UITableViewDelegate{
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if let root = searchRoot {
+        if searchRoot != nil {
             switch section {
             case 0:
                 return "Paises"
@@ -174,11 +175,35 @@ extension MainController: UITableViewDataSource, UITableViewDelegate{
     @objc
     func updatePais(_ sender: UIButton) {
         print("Actualizar pais")
+        self.pais = paises[sender.tag]
+        self.performSegue(withIdentifier: "toFormPais", sender: self)
     }
     
     @objc
     func deletePais(_ sender: UIButton) {
         print("Eliminar pais")
+        let pais = paises[sender.tag]
+        PaisViewModel.Delete(pais.IdPais) { responseSource, resultSource, errorSource in
+            if let result = resultSource {
+                let root = result.Object as! Root<Pais>
+                if root.correct {
+                    DispatchQueue.main.async {
+                        self.showDialog("Operacion Correcta", root.statusMessage!)
+                        self.GetAllPaises()
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        self.showDialog("Error", root.statusMessage!)
+                    }
+                }
+            }
+            
+            if let error = errorSource {
+                DispatchQueue.main.async {
+                    self.showDialog("Error", error.localizedDescription)
+                }
+            }
+        }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -197,7 +222,8 @@ extension MainController: UITableViewDataSource, UITableViewDelegate{
             nextVC.idPais = self.idPais
             break
         case "toFormPais":
-            _ = segue.destination as! PaisController
+            let nextVC = segue.destination as! PaisController
+            nextVC.pais = self.pais
             break
         default:
             break

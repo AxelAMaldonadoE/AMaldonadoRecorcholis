@@ -15,17 +15,18 @@ class PaisController: UIViewController {
     @IBOutlet weak var btnActions: UIButton!
     
     // MARK: Variables
-    var idPais: Int? = nil
+    var pais: Pais? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         
-        if idPais != nil {
+        if pais != nil {
             btnActions.setTitle("Actualizar", for: .normal)
             btnActions.setImage(UIImage(systemName: "pencil"), for: .normal)
             btnActions.tintColor = .systemBlue
+            txtNombre.text = pais!.Nombre
         } else {
             btnActions.setTitle("Agregar", for: .normal)
             btnActions.setImage(UIImage(systemName: "plus"), for: .normal)
@@ -55,6 +56,29 @@ class PaisController: UIViewController {
         
         if opcion == "Agregar" {
             PaisViewModel.Add(txtNombre.text!) { responseSource, resultSource, errorSource in
+                if let result = resultSource {
+                    let root = result.Object as! Root<Pais>
+                    if root.correct {
+                        DispatchQueue.main.async {
+                            self.showMessage("Operacion Correcta", root.statusMessage!)
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.showMessage("Error", root.statusMessage!)
+                        }
+                    }
+                }
+                
+                if let error = errorSource {
+                    DispatchQueue.main.async {
+                        self.showMessage("Error", error.localizedDescription)
+                    }
+                }
+            }
+        }
+        
+        if opcion == "Actualizar" {
+            PaisViewModel.Update(txtNombre.text!, pais!.IdPais) { responseSource, resultSource, errorSource in
                 if let result = resultSource {
                     let root = result.Object as! Root<Pais>
                     if root.correct {

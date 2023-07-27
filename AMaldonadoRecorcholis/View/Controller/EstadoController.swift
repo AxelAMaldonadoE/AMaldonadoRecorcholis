@@ -16,13 +16,13 @@ class EstadoController: UIViewController {
     
     // MARK: Variables
     var idPais: Int? = nil
-    var idEstado: Int? = nil
+    var estado: Estado? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        if idEstado != nil {
+        if estado != nil {
             btnActions.setTitle("Actualizar", for: .normal)
             btnActions.setImage(UIImage(systemName: "pencil"), for: .normal)
             btnActions.tintColor = .systemBlue
@@ -56,6 +56,29 @@ class EstadoController: UIViewController {
         
         if opcion == "Agregar" {
             EstadoViewModel.Add(txtNombre.text!, idPais: idPais!) { responseSource, resultSource, errorSource in
+                if let result = resultSource {
+                    let root = result.Object as! Root<Estado>
+                    if root.correct {
+                        DispatchQueue.main.async {
+                            self.showMessage("Operacion Correcta", root.statusMessage!)
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.showMessage("Error", root.statusMessage!)
+                        }
+                    }
+                }
+                
+                if let error = errorSource {
+                    DispatchQueue.main.async {
+                        self.showMessage("Error", error.localizedDescription)
+                    }
+                }
+            }
+        }
+        
+        if opcion == "Actualizar" {
+            EstadoViewModel.Update(estado!.IdEstado, txtNombre.text!) { responseSource, resultSource, errorSource in
                 if let result = resultSource {
                     let root = result.Object as! Root<Estado>
                     if root.correct {
