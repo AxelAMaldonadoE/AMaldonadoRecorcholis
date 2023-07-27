@@ -15,6 +15,16 @@
 		FA0A954C2A70A65F007BB194 /* MainController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0A954B2A70A65F007BB194 /* MainController.swift */; };
 		FA0A954F2A70A699007BB194 /* PaisViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0A954E2A70A699007BB194 /* PaisViewModel.swift */; };
 		FA0A95512A70A6D7007BB194 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0A95502A70A6D7007BB194 /* Result.swift */; };
+		FA0A95532A70A8C4007BB194 /* EstadoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0A95522A70A8C4007BB194 /* EstadoViewModel.swift */; };
+		FA0A95552A70AA47007BB194 /* Root.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0A95542A70AA47007BB194 /* Root.swift */; };
+		FAFECF602A71881000C9CAB4 /* Pais.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFECF5F2A71881000C9CAB4 /* Pais.swift */; };
+		FAFECF622A71883700C9CAB4 /* Estado.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFECF612A71883700C9CAB4 /* Estado.swift */; };
+		FAFECF642A71AB5600C9CAB4 /* EstadosController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFECF632A71AB5600C9CAB4 /* EstadosController.swift */; };
+		FAFECF662A71C8BB00C9CAB4 /* PaisController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFECF652A71C8BB00C9CAB4 /* PaisController.swift */; };
+		FAFECF682A71DA0D00C9CAB4 /* EstadoController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFECF672A71DA0D00C9CAB4 /* EstadoController.swift */; };
+		FAFECF6A2A71E79900C9CAB4 /* RootSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFECF692A71E79900C9CAB4 /* RootSearch.swift */; };
+		FAFECF6E2A71F8DA00C9CAB4 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAFECF6C2A71F8DA00C9CAB4 /* CustomCell.swift */; };
+		FAFECF6F2A71F8DA00C9CAB4 /* CustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = FAFECF6D2A71F8DA00C9CAB4 /* CustomCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +38,16 @@
 		FA0A954B2A70A65F007BB194 /* MainController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainController.swift; sourceTree = "<group>"; };
 		FA0A954E2A70A699007BB194 /* PaisViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaisViewModel.swift; sourceTree = "<group>"; };
 		FA0A95502A70A6D7007BB194 /* Result.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Result.swift; sourceTree = "<group>"; };
+		FA0A95522A70A8C4007BB194 /* EstadoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstadoViewModel.swift; sourceTree = "<group>"; };
+		FA0A95542A70AA47007BB194 /* Root.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Root.swift; sourceTree = "<group>"; };
+		FAFECF5F2A71881000C9CAB4 /* Pais.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pais.swift; sourceTree = "<group>"; };
+		FAFECF612A71883700C9CAB4 /* Estado.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Estado.swift; sourceTree = "<group>"; };
+		FAFECF632A71AB5600C9CAB4 /* EstadosController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstadosController.swift; sourceTree = "<group>"; };
+		FAFECF652A71C8BB00C9CAB4 /* PaisController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaisController.swift; sourceTree = "<group>"; };
+		FAFECF672A71DA0D00C9CAB4 /* EstadoController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EstadoController.swift; sourceTree = "<group>"; };
+		FAFECF692A71E79900C9CAB4 /* RootSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootSearch.swift; sourceTree = "<group>"; };
+		FAFECF6C2A71F8DA00C9CAB4 /* CustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
+		FAFECF6D2A71F8DA00C9CAB4 /* CustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				FA0A954E2A70A699007BB194 /* PaisViewModel.swift */,
+				FA0A95522A70A8C4007BB194 /* EstadoViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -82,6 +103,7 @@
 		FA0A95482A70A5D0007BB194 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				FAFECF6B2A71F87800C9CAB4 /* TableViewCell */,
 				FA0A954A2A70A5F8007BB194 /* Controller */,
 				FA0A95392A70A5BD007BB194 /* Main.storyboard */,
 				FA0A953E2A70A5BF007BB194 /* LaunchScreen.storyboard */,
@@ -93,6 +115,10 @@
 			isa = PBXGroup;
 			children = (
 				FA0A95502A70A6D7007BB194 /* Result.swift */,
+				FA0A95542A70AA47007BB194 /* Root.swift */,
+				FAFECF5F2A71881000C9CAB4 /* Pais.swift */,
+				FAFECF612A71883700C9CAB4 /* Estado.swift */,
+				FAFECF692A71E79900C9CAB4 /* RootSearch.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -101,8 +127,20 @@
 			isa = PBXGroup;
 			children = (
 				FA0A954B2A70A65F007BB194 /* MainController.swift */,
+				FAFECF632A71AB5600C9CAB4 /* EstadosController.swift */,
+				FAFECF652A71C8BB00C9CAB4 /* PaisController.swift */,
+				FAFECF672A71DA0D00C9CAB4 /* EstadoController.swift */,
 			);
 			path = Controller;
+			sourceTree = "<group>";
+		};
+		FAFECF6B2A71F87800C9CAB4 /* TableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				FAFECF6C2A71F8DA00C9CAB4 /* CustomCell.swift */,
+				FAFECF6D2A71F8DA00C9CAB4 /* CustomCell.xib */,
+			);
+			path = TableViewCell;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -165,6 +203,7 @@
 			files = (
 				FA0A95402A70A5BF007BB194 /* LaunchScreen.storyboard in Resources */,
 				FA0A953D2A70A5BF007BB194 /* Assets.xcassets in Resources */,
+				FAFECF6F2A71F8DA00C9CAB4 /* CustomCell.xib in Resources */,
 				FA0A953B2A70A5BD007BB194 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -178,9 +217,18 @@
 			files = (
 				FA0A95342A70A5BD007BB194 /* AppDelegate.swift in Sources */,
 				FA0A95512A70A6D7007BB194 /* Result.swift in Sources */,
+				FAFECF662A71C8BB00C9CAB4 /* PaisController.swift in Sources */,
+				FAFECF602A71881000C9CAB4 /* Pais.swift in Sources */,
+				FA0A95552A70AA47007BB194 /* Root.swift in Sources */,
+				FAFECF6A2A71E79900C9CAB4 /* RootSearch.swift in Sources */,
+				FAFECF682A71DA0D00C9CAB4 /* EstadoController.swift in Sources */,
+				FA0A95532A70A8C4007BB194 /* EstadoViewModel.swift in Sources */,
+				FAFECF622A71883700C9CAB4 /* Estado.swift in Sources */,
 				FA0A954C2A70A65F007BB194 /* MainController.swift in Sources */,
 				FA0A95362A70A5BD007BB194 /* SceneDelegate.swift in Sources */,
 				FA0A954F2A70A699007BB194 /* PaisViewModel.swift in Sources */,
+				FAFECF6E2A71F8DA00C9CAB4 /* CustomCell.swift in Sources */,
+				FAFECF642A71AB5600C9CAB4 /* EstadosController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
