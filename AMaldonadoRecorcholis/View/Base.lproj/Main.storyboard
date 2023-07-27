@@ -86,7 +86,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pRc-Z7-Azd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="862" y="-656"/>
+            <point key="canvasLocation" x="124" y="-1029"/>
         </scene>
         <!--Main Controller-->
         <scene sceneID="tne-QT-ifu">
@@ -167,7 +167,7 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                             </tableView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g40-JC-Xza">
-                                <rect key="frame" x="262" y="12" width="115" height="35"/>
+                                <rect key="frame" x="262" y="15" width="115" height="35"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="plain" image="plus.circle" catalog="system" title="Agregar" imagePadding="4"/>
                                 <connections>
@@ -185,9 +185,9 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="Cdo-PM-npq" firstAttribute="leading" secondItem="2Fq-fW-Uy6" secondAttribute="leading" id="OG1-0r-n6G"/>
-                            <constraint firstItem="g40-JC-Xza" firstAttribute="top" secondItem="2Fq-fW-Uy6" secondAttribute="top" constant="12" id="QeH-A7-oBl"/>
+                            <constraint firstItem="g40-JC-Xza" firstAttribute="centerY" secondItem="WdN-et-aSL" secondAttribute="centerY" id="QeH-A7-oBl"/>
                             <constraint firstItem="2Fq-fW-Uy6" firstAttribute="bottom" secondItem="Cdo-PM-npq" secondAttribute="bottom" id="UWp-lP-h0O"/>
-                            <constraint firstItem="Cdo-PM-npq" firstAttribute="top" secondItem="g40-JC-Xza" secondAttribute="bottom" constant="12" id="X5C-3X-Id6"/>
+                            <constraint firstItem="Cdo-PM-npq" firstAttribute="top" secondItem="WdN-et-aSL" secondAttribute="bottom" constant="14.333333333333329" id="X5C-3X-Id6"/>
                             <constraint firstItem="g40-JC-Xza" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="WdN-et-aSL" secondAttribute="trailing" constant="16" id="gRX-Ps-ahh"/>
                             <constraint firstItem="2Fq-fW-Uy6" firstAttribute="trailing" secondItem="g40-JC-Xza" secondAttribute="trailing" constant="16" id="gfi-q8-VG0"/>
                             <constraint firstItem="2Fq-fW-Uy6" firstAttribute="trailing" secondItem="Cdo-PM-npq" secondAttribute="trailing" id="iRy-QJ-IPB"/>
@@ -196,18 +196,19 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="lblPais" destination="WdN-et-aSL" id="rcr-M3-eX9"/>
                         <outlet property="tvEstados" destination="Cdo-PM-npq" id="ZUW-lM-Ode"/>
                         <segue destination="b34-kh-oxC" kind="presentation" identifier="toFormEstado" modalPresentationStyle="fullScreen" id="UXd-WI-CyJ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="k7c-fF-MIb" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="863" y="-2"/>
+            <point key="canvasLocation" x="1036" y="-1060"/>
         </scene>
         <!--Estado Controller-->
         <scene sceneID="pLF-6B-zCb">
             <objects>
-                <viewController id="b34-kh-oxC" customClass="EstadoController" customModule="AMaldonadoRecorcholis" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="toFormEstado" id="b34-kh-oxC" customClass="EstadoController" customModule="AMaldonadoRecorcholis" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="p8P-kq-C7h">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -281,7 +282,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4o9-oZ-KbZ" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1634" y="-2"/>
+            <point key="canvasLocation" x="1036" y="-330"/>
         </scene>
     </scenes>
     <resources>

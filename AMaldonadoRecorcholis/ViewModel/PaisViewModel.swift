@@ -11,7 +11,7 @@ class PaisViewModel {
     
     private static let baseUrl = "http://localhost/ProjectRecorcholis/"
     
-    static func Add(_ nombre: String, Response: @escaping(HTTPURLResponse?, Result?, Error?) -> Void) {
+    static func Add(_ nombre: String, Response: @escaping(Result?, Error?) -> Void) {
         var result = Result()
         let urlStr = "\(baseUrl)addPais.php"
         let url = URL(string: urlStr)!
@@ -28,27 +28,27 @@ class PaisViewModel {
             if let httpResponse = response as? HTTPURLResponse {
                 if let dataSource = data {
                     let decoder = JSONDecoder()
+                    let root = try! decoder.decode(ServiceStatus.self, from: dataSource)
                     if 200...299 ~= httpResponse.statusCode {
-                        let root = try! decoder.decode(Root<Pais>.self, from: dataSource)
-                        
-                        result.Object = root
                         result.Correct = true
                     }
+                    
+                    result.Object = root
                 }
                 
-                Response(httpResponse, result, nil)
+                Response(result, nil)
                 print("Response Add Pais")
             }
             
             if let errorSource = error {
-                Response(nil, nil, errorSource)
+                Response(nil, errorSource)
                 print("Error Add Pais")
             }
         }.resume()
         
     }
     
-    static func Update(_ nombre: String, _ id: Int, Response: @escaping(HTTPURLResponse?, Result?, Error?) -> Void) {
+    static func Update(_ nombre: String, _ id: Int, Response: @escaping(Result?, Error?) -> Void) {
         var result = Result()
         let urlStr = "\(baseUrl)updatePais.php"
         let url = URL(string: urlStr)!
@@ -66,27 +66,28 @@ class PaisViewModel {
             if let httpResponse = response as? HTTPURLResponse {
                 if let dataSource = data {
                     let decoder = JSONDecoder()
+                    let root = try! decoder.decode(ServiceStatus.self, from: dataSource)
+                    
                     if 200...299 ~= httpResponse.statusCode {
-                        let root = try! decoder.decode(Root<Pais>.self, from: dataSource)
-                        
-                        result.Object = root
                         result.Correct = true
                     }
+                    
+                    result.Object = root
                 }
                 
-                Response(httpResponse, result, nil)
+                Response(result, nil)
                 print("Response Add Pais")
             }
             
             if let errorSource = error {
-                Response(nil, nil, errorSource)
+                Response(nil, errorSource)
                 print("Error Add Pais")
             }
         }.resume()
         
     }
     
-    static func Delete(_ id: Int, Response: @escaping(HTTPURLResponse?, Result?, Error?) -> Void) {
+    static func Delete(_ id: Int, Response: @escaping(Result?, Error?) -> Void) {
         var result = Result()
         let urlStr = "\(baseUrl)deletePais.php?idPais=\(id)"
         let url = URL(string: urlStr)!
@@ -97,77 +98,88 @@ class PaisViewModel {
         URLSession.shared.dataTask(with: request) {data, response, error in
             if let httpResponse = response as? HTTPURLResponse {
                 if let dataSource = data {
+                    let decoder = JSONDecoder()
+                    let root = try! decoder.decode(ServiceStatus.self, from: dataSource)
+                    result.Object = root
+                    
                     if 200...299 ~= httpResponse.statusCode {
-                        let decoder = JSONDecoder()
-                        let root = try! decoder.decode(Root<Pais>.self, from: dataSource)
-                        
-                        result.Object = root
                         result.Correct = true
                     }
                 }
                 
-                Response(httpResponse, result, nil)
+                Response(result, nil)
                 print("response Delete pais")
             }
             
             if let errorSource = error {
-                Response(nil, nil, errorSource)
+                Response(nil, errorSource)
                 print("Error Delete Pais")
             }
         }.resume()
     }
     
-    static func GetAll(Response: @escaping(HTTPURLResponse?, Result?, Error?) -> Void) {
+    static func GetAll(Response: @escaping(Result?, Error?) -> Void) {
         var result = Result()
         let url = URL(string: "\(baseUrl)getPaises.php")!
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let responseSource = response as? HTTPURLResponse {
-                if 200...299 ~= responseSource.statusCode {
-                    if let dataSource = data {
-                        let jsonDecoder = JSONDecoder()
-                        let obj = try! jsonDecoder.decode(Root<Pais>.self, from: dataSource)
-                        
-                        result.Object = obj
+                if let dataSource = data {
+                    let jsonDecoder = JSONDecoder()
+                    var root: Any? = nil
+                    
+                    if 200...299 ~= responseSource.statusCode {
+                        root = try! jsonDecoder.decode(Root<Pais>.self, from: dataSource)
                         result.Correct = true
                     }
+                    
+                    if 400...499 ~= responseSource.statusCode {
+                        root = try! jsonDecoder.decode(ServiceStatus.self, from: dataSource)
+                    }
+                    
+                    result.Object = root
                 }
                 
-                Response(responseSource, result, nil)
+                Response(result, nil)
                 print("Response Get All Paises")
             }
             
             if let errorSource = error {
-                Response(nil, nil, errorSource)
+                Response(nil, errorSource)
                 print("Error Get All Paises")
             }
         }.resume()
         
     }
     
-    static func SearchByNombre(_ nombre: String, Response: @escaping(HTTPURLResponse?, Result?, Error?) -> Void) {
+    static func SearchByNombre(_ nombre: String, Response: @escaping(Result?, Error?) -> Void) {
         let urlStr = "\(baseUrl)openSearch.php?keyword=\(nombre)"
         let url = URL(string: urlStr)!
         var result = Result()
         
         URLSession.shared.dataTask(with: url) {data, response, error in
             if let responseSource = response as? HTTPURLResponse {
-                if 200...299 ~= responseSource.statusCode {
-                    if let dataSource = data {
-                        let jsonDecoder = JSONDecoder()
-                        let obj = try! jsonDecoder.decode(RootSearch.self, from: dataSource)
-                        
-                        result.Object = obj
+                if let dataSource = data {
+                    let jsonDecoder = JSONDecoder()
+                    var root: Any? = nil
+                    if 200...299 ~= responseSource.statusCode {
+                        root = try! jsonDecoder.decode(RootSearch.self, from: dataSource)
                         result.Correct = true
                     }
+                    
+                    if 400...499 ~= responseSource.statusCode {
+                        root = try! jsonDecoder.decode(ServiceStatus.self, from: dataSource)
+                    }
+                    
+                    result.Object = root
                 }
                 
-                Response(responseSource, result, nil)
+                Response(result, nil)
                 print("Response SearchByNombre")
             }
             
             if let errorSource = error {
-                Response(nil, nil, errorSource)
+                Response(nil, errorSource)
                 print("Error SearchByNombre")
             }
         }.resume()

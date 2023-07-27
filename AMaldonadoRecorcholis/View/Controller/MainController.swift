@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SwipeCellKit
 
 class MainController: UIViewController {
     
@@ -15,7 +16,7 @@ class MainController: UIViewController {
     
     // MARK: Variables
     var paises: [Pais] = []
-    var idPais: Int? = nil
+//    var idPais: Int? = nil
     var pais: Pais? = nil
     var searchRoot: RootSearch? = nil
 
@@ -34,24 +35,26 @@ class MainController: UIViewController {
         super.viewWillAppear(animated)
         
         GetAllPaises()
+        if sbBuscar.text != "" {
+            sbBuscar.text = ""
+        }
     }
     
     // MARK: Funciones para obtener datos
     private func GetAllPaises() {
-        PaisViewModel.GetAll { responseSource, resultSource, errorSource in
-            if let _ = responseSource {
-                if resultSource!.Correct {
-                    self.CleanInfo()
-                    let root = resultSource!.Object as! Root<Pais>
-                    self.paises = root.results!
-                    print("Numero de paises: \(self.paises.count)")
-                    DispatchQueue.main.async {
-                        self.tvGeneral.reloadData()
-                    }
-                } else {
-                    DispatchQueue.main.async {
-                        self.showDialog("Alerta", "No se encontro la información")
-                    }
+        PaisViewModel.GetAll { resultSource, errorSource in
+            if resultSource!.Correct {
+                self.CleanInfo()
+                let root = resultSource!.Object as! Root<Pais>
+                self.paises = root.results!
+                print("Numero de paises: \(self.paises.count)")
+                DispatchQueue.main.async {
+                    self.tvGeneral.reloadData()
+                }
+            } else {
+                let root = resultSource!.Object as! ServiceStatus
+                DispatchQueue.main.async {
+                    self.showDialog("Alerta", root.statusMessage!)
                 }
             }
         }
@@ -129,7 +132,10 @@ extension MainController: UITableViewDataSource, UITableViewDelegate{
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let celda = tableView.dequeueReusableCell(withIdentifier: "customCell", for: indexPath) as! CustomCell
+        guard let celda = tableView.dequeueReusableCell(withIdentifier: "customCell", for: indexPath) as? CustomCell else {
+            return UITableViewCell()
+        }
+        celda.delegate = self
         celda.selectionStyle = .none
         
         if let root = searchRoot {
@@ -139,11 +145,14 @@ extension MainController: UITableViewDataSource, UITableViewDelegate{
                 if let results = root.paises {
                     if results.count > 0 {
                         celda.lblTitle.text = "\(indexPath.row + 1).- \(results[indexPath.row].Nombre)"
+                        celda.lblTitle.textColor = .black
+                        celda.backgroundColor = .white
                     } else {
                         celda.lblTitle.text = "No hay coincidencias!"
+                        celda.delegate = nil
+                        celda.lblTitle.textColor = .systemYellow.withAlphaComponent(1)
+                        celda.backgroundColor = .systemYellow.withAlphaComponent(0.20)
                     }
-                    celda.btnDelete.removeFromSuperview()
-                    celda.btnUpdate.removeFromSuperview()
                 }
                 break
             // Seccion Estados
@@ -151,11 +160,14 @@ extension MainController: UITableViewDataSource, UITableViewDelegate{
                 if let results = root.estados {
                     if results.count > 0 {
                         celda.lblTitle.text = "\(indexPath.row + 1).- \(results[indexPath.row].Nombre) \nPais: \(results[indexPath.row].Pais!)"
+                        celda.lblTitle.textColor = .black
+                        celda.backgroundColor = .white
                     } else {
                         celda.lblTitle.text = "No hay coincidencias!"
+                        celda.delegate = nil
+                        celda.lblTitle.textColor = .systemYellow.withAlphaComponent(1)
+                        celda.backgroundColor = .systemYellow.withAlphaComponent(0.20)
                     }
-                    celda.btnDelete.removeFromSuperview()
-                    celda.btnUpdate.removeFromSuperview()
                 }
                 break
             default:
@@ -163,38 +175,30 @@ extension MainController: UITableViewDataSource, UITableViewDelegate{
             }
         } else {
             celda.lblTitle.text = "\(indexPath.row + 1).- \(paises[indexPath.row].Nombre)"
-            celda.btnDelete.tag = indexPath.row
-            celda.btnUpdate.tag = indexPath.row
-            celda.btnUpdate.addTarget(self, action: #selector(updatePais), for: .touchUpInside)
-            celda.btnDelete.addTarget(self, action: #selector(deletePais), for: .touchUpInside)
+            celda.lblTitle.textColor = .black
+            celda.backgroundColor = .white
         }
         
         return celda
     }
     
     @objc
-    func updatePais(_ sender: UIButton) {
-        print("Actualizar pais")
-        self.pais = paises[sender.tag]
-        self.performSegue(withIdentifier: "toFormPais", sender: self)
-    }
-    
-    @objc
     func deletePais(_ sender: UIButton) {
         print("Eliminar pais")
         let pais = paises[sender.tag]
-        PaisViewModel.Delete(pais.IdPais) { responseSource, resultSource, errorSource in
-            if let result = resultSource {
-                let root = result.Object as! Root<Pais>
+        PaisViewModel.Delete(pais.IdPais) { resultSource, errorSource in
+            if resultSource!.Correct {
+                let root = resultSource!.Object as! ServiceStatus
                 if root.correct {
                     DispatchQueue.main.async {
                         self.showDialog("Operacion Correcta", root.statusMessage!)
                         self.GetAllPaises()
                     }
-                } else {
-                    DispatchQueue.main.async {
-                        self.showDialog("Error", root.statusMessage!)
-                    }
+                }
+            } else {
+                let root = resultSource!.Object as! ServiceStatus
+                DispatchQueue.main.async {
+                    self.showDialog("Error", root.statusMessage!)
                 }
             }
             
@@ -209,7 +213,7 @@ extension MainController: UITableViewDataSource, UITableViewDelegate{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if self.searchRoot == nil {
             print("Pais: \(self.paises[indexPath.row])")
-            self.idPais = self.paises[indexPath.row].IdPais
+            self.pais = self.paises[indexPath.row]
             self.performSegue(withIdentifier: "toShowEstados", sender: self)
         }
     }
@@ -219,7 +223,7 @@ extension MainController: UITableViewDataSource, UITableViewDelegate{
         switch identificador {
         case "toShowEstados":
             let nextVC = segue.destination as! EstadosController
-            nextVC.idPais = self.idPais
+            nextVC.pais = self.pais
             break
         case "toFormPais":
             let nextVC = segue.destination as! PaisController
@@ -236,15 +240,18 @@ extension MainController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let nombre = searchBar.text!
-        PaisViewModel.SearchByNombre(nombre) { responseSource, resultSource, errorSource in
-            if let result = resultSource {
-                let rootSearch = result.Object as! RootSearch
-                if rootSearch.correct {
-                    self.CleanInfo()
-                    self.searchRoot = rootSearch
-                    DispatchQueue.main.async {
-                        self.tvGeneral.reloadData()
-                    }
+        PaisViewModel.SearchByNombre(nombre) { resultSource, errorSource in
+            if resultSource!.Correct {
+                let rootSearch = resultSource!.Object as! RootSearch
+                self.CleanInfo()
+                self.searchRoot = rootSearch
+                DispatchQueue.main.async {
+                    self.tvGeneral.reloadData()
+                }
+            } else {
+                let root = resultSource!.Object as! ServiceStatus
+                DispatchQueue.main.async {
+                    self.showDialog("Error", root.statusMessage!)
                 }
             }
         }
@@ -254,5 +261,95 @@ extension MainController: UISearchBarDelegate {
         if searchBar.text == "" {
             GetAllPaises()
         }
+    }
+}
+
+// MARK: Extension Swipe Cell Kit
+extension MainController: SwipeTableViewCellDelegate {
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        
+        // Update Action
+        if orientation == .left {
+            let updateAction = SwipeAction(style: .default, title: "Actualizar") { action, indexPath in
+                print("Actualizar")
+                if let rootSearch = self.searchRoot {
+                    switch indexPath.section {
+                    
+                        // Paises
+                    case 0:
+                        if rootSearch.paises!.count > 0 {
+                            self.pais = rootSearch.paises![indexPath.row]
+                            self.performSegue(withIdentifier: "toFormPais", sender: self)
+                        }
+                        break
+                        
+                        // Estados
+                    case 1:
+                        if rootSearch.estados!.count > 0 {
+                            let nextVC = self.storyboard?.instantiateViewController(withIdentifier: "toFormEstado") as! EstadoController
+                            nextVC.fromMainController = true
+                            nextVC.estado = rootSearch.estados![indexPath.row]
+                            nextVC.modalPresentationStyle = .fullScreen
+                            self.present(nextVC, animated: true)
+                        }
+                        break
+                        
+                    default:
+                        break
+                    }
+                } else {
+                    self.pais = self.paises[indexPath.row]
+                    self.performSegue(withIdentifier: "toFormPais", sender: self)
+                }
+            }
+            
+            updateAction.backgroundColor = .systemBlue
+            updateAction.image = UIImage(systemName: "pencil")
+            
+            return [updateAction]
+        } else {
+            let deleteAction = SwipeAction(style: .default, title: "Eliminar") { action, indexPath in
+                print("Eliminar pais")
+                let pais = self.paises[indexPath.row]
+                PaisViewModel.Delete(pais.IdPais) { resultSource, errorSource in
+                    if resultSource!.Correct{
+                        let root = resultSource!.Object as! ServiceStatus
+                        if root.correct {
+                            DispatchQueue.main.async {
+                                self.showDialog("Operacion Correcta", root.statusMessage!)
+                                self.GetAllPaises()
+                            }
+                        }
+                    } else {
+                        let root = resultSource!.Object as! ServiceStatus
+                        DispatchQueue.main.async {
+                            self.showDialog("Error", root.statusMessage!)
+                        }
+                    }
+                    
+                    if let error = errorSource {
+                        DispatchQueue.main.async {
+                            self.showDialog("Error", error.localizedDescription)
+                        }
+                    }
+                }
+            }
+            
+            deleteAction.backgroundColor = .systemRed
+            deleteAction.image = UIImage(systemName: "trash")
+            
+            return [deleteAction]
+        }
+        
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
+        var options = SwipeOptions()
+        
+        options.expansionStyle = .selection
+        options.transitionStyle = .border
+        
+        return options
     }
 }

@@ -6,12 +6,11 @@
 //
 
 import UIKit
+import SwipeCellKit
 
-class CustomCell: UITableViewCell {
+class CustomCell: SwipeTableViewCell{
 
     @IBOutlet weak var lblTitle: UILabel!
-    @IBOutlet weak var btnUpdate: UIButton!
-    @IBOutlet weak var btnDelete: UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()

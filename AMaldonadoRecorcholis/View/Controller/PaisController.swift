@@ -36,6 +36,15 @@ class PaisController: UIViewController {
         txtNombre.delegate = self
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if pais != nil {
+            let backVC = presentingViewController as! MainController
+            backVC.pais = nil
+        }
+    }
+    
     @IBAction func btnBack() {
         self.dismiss(animated: true)
     }
@@ -55,17 +64,18 @@ class PaisController: UIViewController {
         let opcion = sender.titleLabel?.text
         
         if opcion == "Agregar" {
-            PaisViewModel.Add(txtNombre.text!) { responseSource, resultSource, errorSource in
-                if let result = resultSource {
-                    let root = result.Object as! Root<Pais>
+            PaisViewModel.Add(txtNombre.text!) { resultSource, errorSource in
+                if resultSource!.Correct {
+                    let root = resultSource!.Object as! ServiceStatus
                     if root.correct {
                         DispatchQueue.main.async {
                             self.showMessage("Operacion Correcta", root.statusMessage!)
                         }
-                    } else {
-                        DispatchQueue.main.async {
-                            self.showMessage("Error", root.statusMessage!)
-                        }
+                    }
+                }  else {
+                    let root = resultSource!.Object as! ServiceStatus
+                    DispatchQueue.main.async {
+                        self.showMessage("Error", root.statusMessage!)
                     }
                 }
                 
@@ -78,17 +88,18 @@ class PaisController: UIViewController {
         }
         
         if opcion == "Actualizar" {
-            PaisViewModel.Update(txtNombre.text!, pais!.IdPais) { responseSource, resultSource, errorSource in
-                if let result = resultSource {
-                    let root = result.Object as! Root<Pais>
+            PaisViewModel.Update(txtNombre.text!, pais!.IdPais) { resultSource, errorSource in
+                if resultSource!.Correct {
+                    let root = resultSource!.Object as! ServiceStatus
                     if root.correct {
                         DispatchQueue.main.async {
                             self.showMessage("Operacion Correcta", root.statusMessage!)
                         }
-                    } else {
-                        DispatchQueue.main.async {
-                            self.showMessage("Error", root.statusMessage!)
-                        }
+                    }
+                } else {
+                    let root = resultSource!.Object as! ServiceStatus
+                    DispatchQueue.main.async {
+                        self.showMessage("Error", root.statusMessage!)
                     }
                 }
                 
@@ -121,7 +132,7 @@ extension PaisController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         do {
-            let regex = try NSRegularExpression(pattern: ".*[^A-Za-z ´'Ññ].*", options: [])
+            let regex = try NSRegularExpression(pattern: ".*[^A-Za-zÁ-ÿ'´Ññ].*", options: [])
             if regex.firstMatch(in: string, range: NSMakeRange(0, string.count)) != nil {
                 self.lblError.text = "Debes Ingresar unicamente caracteres alfabeticos!!"
                 self.lblError.isHidden = false

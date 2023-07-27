@@ -11,7 +11,7 @@ class EstadoViewModel {
     
     private static let urlBase = "http://localhost/ProjectRecorcholis/"
     
-    static func Add(_ nombre: String, idPais: Int, Response: @escaping(HTTPURLResponse?, Result?, Error?) -> Void) {
+    static func Add(_ nombre: String, idPais: Int, Response: @escaping(Result?, Error?) -> Void) {
         var result = Result()
         let urlStr = "\(urlBase)addEstado.php"
         let url = URL(string: urlStr)!
@@ -27,27 +27,27 @@ class EstadoViewModel {
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let responseSource = response as? HTTPURLResponse {
                 if let dataSource = data {
+                    let decoder = JSONDecoder()
+                    let root = try! decoder.decode(ServiceStatus.self, from: dataSource)
                     if 200...299 ~= responseSource.statusCode {
-                        let jsonDecoder = JSONDecoder()
-                        let root = try! jsonDecoder.decode(Root<Estado>.self, from: dataSource)
-                        
-                        result.Object = root
                         result.Correct = true
                     }
+                    
+                    result.Object = root
                 }
                 
-                Response(responseSource, result, nil)
+                Response(result, nil)
                 print("Response Add Estado")
             }
             
             if let errorSource = error {
-                Response(nil, nil, errorSource)
+                Response(nil, errorSource)
                 print("Error Add Estado")
             }
         }.resume()
     }
     
-    static func Update(_ idEstado: Int, _ nombre: String, Response: @escaping(HTTPURLResponse?, Result?, Error?) -> Void) {
+    static func Update(_ idEstado: Int, _ nombre: String, Response: @escaping(Result?, Error?) -> Void) {
         let urlStr = "\(urlBase)updateEstado.php"
         let url = URL(string: urlStr)!
         
@@ -64,27 +64,28 @@ class EstadoViewModel {
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let responseSource = response as? HTTPURLResponse {
                 if let dataSource = data {
+                    let decoder = JSONDecoder()
+                    let root = try! decoder.decode(ServiceStatus.self, from: dataSource)
+                    
                     if 200...299 ~= responseSource.statusCode {
-                        let jsonDecoder = JSONDecoder()
-                        let root = try! jsonDecoder.decode(Root<Estado>.self, from: dataSource)
-                        
-                        result.Object = root
                         result.Correct = true
                     }
+                    
+                    result.Object = root
                 }
                 
-                Response(responseSource, result, nil)
+                Response(result, nil)
                 print("Response Add Estado")
             }
             
             if let errorSource = error {
-                Response(nil, nil, errorSource)
+                Response(nil, errorSource)
                 print("Error Add Estado")
             }
         }.resume()
     }
     
-    static func Delete(_ idEstado: Int, Response: @escaping(HTTPURLResponse?, Result?, Error?) -> Void) {
+    static func Delete(_ idEstado: Int, Response: @escaping(Result?, Error?) -> Void) {
         var result = Result()
         let urlStr = "\(urlBase)deleteEstado.php?idEstado=\(idEstado)"
         let url = URL(string: urlStr)!
@@ -95,27 +96,27 @@ class EstadoViewModel {
         URLSession.shared.dataTask(with: request) {data, response, error in
             if let httpResponse = response as? HTTPURLResponse {
                 if let dataSource = data {
+                    let decoder = JSONDecoder()
+                    let root = try! decoder.decode(ServiceStatus.self, from: dataSource)
+                    result.Object = root
+                    
                     if 200...299 ~= httpResponse.statusCode {
-                        let decoder = JSONDecoder()
-                        let root = try! decoder.decode(Root<Estado>.self, from: dataSource)
-                        
-                        result.Object = root
                         result.Correct = true
                     }
                 }
                 
-                Response(httpResponse, result, nil)
+                Response(result, nil)
                 print("response Delete Estado")
             }
             
             if let errorSource = error {
-                Response(nil, nil, errorSource)
+                Response(nil, errorSource)
                 print("Error Delete Estado")
             }
         }.resume()
     }
     
-    static func GetEstados(_ idPais: Int, Response: @escaping(HTTPURLResponse?, Result?, Error?) -> Void) {
+    static func GetEstados(_ idPais: Int, Response: @escaping(Result?, Error?) -> Void) {
         var result = Result()
         let urlStr = "\(urlBase)getEstadosByPais.php"
         let url = URL(string: urlStr)!
@@ -130,21 +131,27 @@ class EstadoViewModel {
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let responseSource = response as? HTTPURLResponse {
                 if let dataSource = data {
+                    let jsonDecoder = JSONDecoder()
+                    var root: Any? = nil
+                    
                     if 200...299 ~= responseSource.statusCode {
-                        let jsonDecoder = JSONDecoder()
-                        let root = try! jsonDecoder.decode(Root<Estado>.self, from: dataSource)
-                        
-                        result.Object = root
+                        root = try! jsonDecoder.decode(Root<Estado>.self, from: dataSource)
                         result.Correct = true
                     }
+                    
+                    if 400...499 ~= responseSource.statusCode {
+                        root = try! jsonDecoder.decode(ServiceStatus.self, from: dataSource)
+                    }
+                    
+                    result.Object = root
                 }
                 
-                Response(responseSource, result, nil)
+                Response(result, nil)
                 print("Response GetEstadosByPais")
             }
             
             if let errorSource = error {
-                Response(nil, nil, errorSource)
+                Response(nil, errorSource)
                 print("Error GetEstadosByPais")
             }
         }.resume()

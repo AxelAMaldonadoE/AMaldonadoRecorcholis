@@ -17,6 +17,7 @@ class EstadoController: UIViewController {
     // MARK: Variables
     var idPais: Int? = nil
     var estado: Estado? = nil
+    var fromMainController: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,6 +27,7 @@ class EstadoController: UIViewController {
             btnActions.setTitle("Actualizar", for: .normal)
             btnActions.setImage(UIImage(systemName: "pencil"), for: .normal)
             btnActions.tintColor = .systemBlue
+            txtNombre.text = estado!.Nombre
         } else {
             btnActions.setTitle("Agregar", for: .normal)
             btnActions.setImage(UIImage(systemName: "plus"), for: .normal)
@@ -34,6 +36,16 @@ class EstadoController: UIViewController {
         
         lblError.isHidden = true
         txtNombre.delegate = self
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        if !fromMainController {
+            let backVC = presentingViewController as! EstadosController
+            backVC.estado = nil
+            backVC.GetEstados(idPais!)
+        }
     }
 
     @IBAction func btnBack() {
@@ -55,17 +67,18 @@ class EstadoController: UIViewController {
         let opcion = sender.titleLabel?.text
         
         if opcion == "Agregar" {
-            EstadoViewModel.Add(txtNombre.text!, idPais: idPais!) { responseSource, resultSource, errorSource in
-                if let result = resultSource {
-                    let root = result.Object as! Root<Estado>
+            EstadoViewModel.Add(txtNombre.text!, idPais: idPais!) { resultSource, errorSource in
+                if resultSource!.Correct {
+                    let root = resultSource!.Object as! ServiceStatus
                     if root.correct {
                         DispatchQueue.main.async {
                             self.showMessage("Operacion Correcta", root.statusMessage!)
                         }
-                    } else {
-                        DispatchQueue.main.async {
-                            self.showMessage("Error", root.statusMessage!)
-                        }
+                    }
+                } else {
+                    let root = resultSource!.Object as! ServiceStatus
+                    DispatchQueue.main.async {
+                        self.showMessage("Error", root.statusMessage!)
                     }
                 }
                 
@@ -78,17 +91,18 @@ class EstadoController: UIViewController {
         }
         
         if opcion == "Actualizar" {
-            EstadoViewModel.Update(estado!.IdEstado, txtNombre.text!) { responseSource, resultSource, errorSource in
-                if let result = resultSource {
-                    let root = result.Object as! Root<Estado>
+            EstadoViewModel.Update(estado!.IdEstado, txtNombre.text!) {resultSource, errorSource in
+                if resultSource!.Correct {
+                    let root = resultSource!.Object as! ServiceStatus
                     if root.correct {
                         DispatchQueue.main.async {
                             self.showMessage("Operacion Correcta", root.statusMessage!)
                         }
-                    } else {
-                        DispatchQueue.main.async {
-                            self.showMessage("Error", root.statusMessage!)
-                        }
+                    }
+                } else {
+                    let root = resultSource!.Object as! ServiceStatus
+                    DispatchQueue.main.async {
+                        self.showMessage("Error", root.statusMessage!)
                     }
                 }
                 
@@ -120,7 +134,7 @@ extension EstadoController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         do {
-            let regex = try NSRegularExpression(pattern: ".*[^A-Za-z ´'Ññ].*", options: [])
+            let regex = try NSRegularExpression(pattern: ".*[^A-Za-zÀ-ÿ'´Ññ].*", options: [])
             if regex.firstMatch(in: string, range: NSMakeRange(0, string.count)) != nil {
                 self.lblError.text = "Debes Ingresar unicamente caracteres alfabeticos!!"
                 self.lblError.isHidden = false

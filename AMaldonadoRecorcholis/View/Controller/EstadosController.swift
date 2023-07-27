@@ -6,14 +6,16 @@
 //
 
 import UIKit
+import SwipeCellKit
 
 class EstadosController: UIViewController {
     
     // MARK: IBOutlet
     @IBOutlet weak var tvEstados: UITableView!
+    @IBOutlet weak var lblPais: UILabel!
     
     // MARK: Variables
-    var idPais: Int? = nil
+    var pais: Pais? = nil
     var estados: [Estado] = []
     var idEstado: Int? = nil
     var estado: Estado? = nil
@@ -24,8 +26,9 @@ class EstadosController: UIViewController {
         // Do any additional setup after loading the view.
         tvEstados.dataSource = self
         tvEstados.register(UINib(nibName: "CustomCell", bundle: nil), forCellReuseIdentifier: "customCell")
-        if let id = idPais {
-            GetEstados(id)
+        if let pais = pais {
+            lblPais.text = pais.Nombre
+            GetEstados(pais.IdPais)
         }
     }
     
@@ -34,18 +37,18 @@ class EstadosController: UIViewController {
     }
     
     // MARK: Funciones privadas
-    private func GetEstados(_ idPais: Int) {
-        EstadoViewModel.GetEstados(idPais) { responseSource, resultSource, errorSource in
-            if let response = responseSource {
-                if resultSource!.Correct {
-                    let root = resultSource!.Object as! Root<Estado>
-                    if let results = root.results {
-                        self.estados = results
-                    }
-                    DispatchQueue.main.async {
-                        self.tvEstados.reloadData()
-                    }
+    func GetEstados(_ idPais: Int) {
+        EstadoViewModel.GetEstados(idPais) { resultSource, errorSource in
+            self.estados.removeAll()
+            if resultSource!.Correct {
+                let root = resultSource!.Object as! Root<Estado>
+                if root.results!.count > 0 {
+                    self.estados = root.results!
                 }
+            }
+            
+            DispatchQueue.main.async {
+                self.tvEstados.reloadData()
             }
         }
     }
@@ -60,12 +63,12 @@ class EstadosController: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         let backVC = self.presentingViewController as! MainController
-        backVC.idPais = nil
+        backVC.pais = nil
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let nextVC = segue.destination as! EstadoController
-        nextVC.idPais = self.idPais
+        nextVC.idPais = self.pais!.IdPais
         if self.estado != nil {
             // Agregar el id del estado a actualizar
             nextVC.estado = self.estado
@@ -89,54 +92,84 @@ extension EstadosController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let celda = tableView.dequeueReusableCell(withIdentifier: "customCell", for: indexPath) as! CustomCell
+        guard let celda = tableView.dequeueReusableCell(withIdentifier: "customCell", for: indexPath) as? CustomCell else {
+            return UITableViewCell()
+        }
+        celda.delegate = self
         if self.estados.count != 0 {
             celda.lblTitle.text = "\(indexPath.row + 1).- \(self.estados[indexPath.row].Nombre)"
-            celda.btnDelete.tag = indexPath.row
-            celda.btnUpdate.tag = indexPath.row
-            celda.btnDelete.addTarget(self, action: #selector(deleteEstado), for: .touchUpInside)
-            celda.btnUpdate.addTarget(self, action: #selector(updateEstado), for: .touchUpInside)
+            celda.lblTitle.textColor = .black
+            celda.backgroundColor = .white
         } else {
             celda.lblTitle.text = "No hay estados en el pais seleccionado!"
-            celda.btnDelete.removeFromSuperview()
-            celda.btnUpdate.removeFromSuperview()
+            celda.lblTitle.textColor = .systemYellow.withAlphaComponent(1)
+            celda.backgroundColor = .systemYellow.withAlphaComponent(0.20)
+            celda.delegate = nil
         }
         celda.selectionStyle = .none
         
+        
         return celda
     }
+}
+
+// MARK: Extension SwipeCellKit
+extension EstadosController: SwipeTableViewCellDelegate {
     
-    @objc
-    func deleteEstado(_ sender: UIButton) {
-        print("Eliminar estado")
-        let estado = estados[sender.tag]
-        EstadoViewModel.Delete(estado.IdEstado) { responseSource, resultSource, errorSource in
-            if let result = resultSource {
-                let root = result.Object as! Root<Estado>
-                if root.correct {
-                    DispatchQueue.main.async {
-                        self.showDialog("Operacion Correcta", root.statusMessage!)
-                        self.GetEstados(self.idPais!)
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        if orientation == .left {
+            let updateAction = SwipeAction(style: .default, title: "Actualizar") { action, indexPath in
+                print("Actualizar estado")
+                self.estado = self.estados[indexPath.row]
+                self.performSegue(withIdentifier: "toFormEstado", sender: self)
+            }
+            
+            updateAction.backgroundColor = .systemBlue
+            updateAction.image = UIImage(systemName: "pencil")
+            
+            return [updateAction]
+        } else {
+            let deleteAction = SwipeAction(style: .default, title: "Eliminar") { action, indexPath in
+                print("Eliminar estado")
+                let estado = self.estados[indexPath.row]
+                EstadoViewModel.Delete(estado.IdEstado) { resultSource, errorSource in
+                    if resultSource!.Correct {
+                        let root = resultSource!.Object as! ServiceStatus
+                        if root.correct {
+                            self.GetEstados(self.pais!.IdPais)
+                            DispatchQueue.main.async {
+                                self.showDialog("Operacion Correcta", root.statusMessage!)
+                            }
+                        }
+                    } else {
+                        let root = resultSource!.Object as! ServiceStatus
+                        DispatchQueue.main.async {
+                            self.showDialog("Error", root.statusMessage!)
+                        }
                     }
-                } else {
-                    DispatchQueue.main.async {
-                        self.showDialog("Error", root.statusMessage!)
+                    
+                    if let error = errorSource {
+                        DispatchQueue.main.async {
+                            self.showDialog("Error", error.localizedDescription)
+                        }
                     }
                 }
             }
             
-            if let error = errorSource {
-                DispatchQueue.main.async {
-                    self.showDialog("Error", error.localizedDescription)
-                }
-            }
+            deleteAction.backgroundColor = .systemRed
+            deleteAction.image = UIImage(systemName: "trash")
+            
+            return [deleteAction]
         }
     }
     
-    @objc
-    func updateEstado(_ sender: UIButton) {
-        print("Actualizar estado")
-        self.estado = estados[sender.tag]
-        self.performSegue(withIdentifier: "toFormEstado", sender: self)
+    func tableView(_ tableView: UITableView, editActionsOptionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> SwipeOptions {
+        
+        var options = SwipeOptions()
+        
+        options.expansionStyle = .selection
+        options.transitionStyle = .border
+        
+        return options
     }
 }
