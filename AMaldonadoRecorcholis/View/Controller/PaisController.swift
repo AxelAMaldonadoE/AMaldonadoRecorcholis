@@ -132,7 +132,7 @@ extension PaisController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         do {
-            let regex = try NSRegularExpression(pattern: ".*[^A-Za-zÁ-ÿ'´Ññ].*", options: [])
+            let regex = try NSRegularExpression(pattern: ".*[^A-Za-zÁ-ÿ'´ Ññ].*", options: [])
             if regex.firstMatch(in: string, range: NSMakeRange(0, string.count)) != nil {
                 self.lblError.text = "Debes Ingresar unicamente caracteres alfabeticos!!"
                 self.lblError.isHidden = false
